@@ -112,20 +112,23 @@ export async function POST(request: NextRequest) {
     await supabase.from("media_assets").insert(assets);
   }
 
-  // Send Inngest event for scheduled posts (non-blocking, won't fail the request)
+  // Send Inngest event for scheduled posts
+  let inngestError: string | null = null;
   if (status === "scheduled") {
     try {
-      await inngest.send({
+      const sendResult = await inngest.send({
         name: "post/schedule",
         data: {
           postId: post.id,
           scheduledAt: scheduledAt || new Date().toISOString(),
         },
       });
+      console.log("Inngest send result:", JSON.stringify(sendResult));
     } catch (err) {
-      console.error("Inngest event send failed (non-blocking):", err);
+      inngestError = err instanceof Error ? err.message : String(err);
+      console.error("Inngest event send failed:", inngestError);
     }
   }
 
-  return NextResponse.json({ id: post.id, status });
+  return NextResponse.json({ id: post.id, status, inngestError });
 }

@@ -24,7 +24,10 @@
       "Bash(vercel dns:*)",
       "Bash(printf '%s' 'signkey-prod-fdb4598a0e2c2b80d295223fbeeb9dfa46b3e8ba9ea16eccb7d472bef2d8e1b1')",
       "Bash(printf '%s' 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3ZmlsenFmdm92c3pmbWtkZ3B2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDkxMjExMywiZXhwIjoyMDkwNDg4MTEzfQ.T7Ltqu4CgzWBiHuxmCCJt1KW2pCTy3eXhLawsnpdmhg')",
-      "Bash(node -e \"const {Inngest} = require\\(''inngest''\\); const i = new Inngest\\({id:''test''}\\); console.log\\(Object.keys\\(i\\).filter\\(k => k.includes\\(''key''\\) || k.includes\\(''Key''\\) || k.includes\\(''event''\\)\\).join\\('', ''\\)\\)\")"
+      "Bash(node -e \"const {Inngest} = require\\(''inngest''\\); const i = new Inngest\\({id:''test''}\\); console.log\\(Object.keys\\(i\\).filter\\(k => k.includes\\(''key''\\) || k.includes\\(''Key''\\) || k.includes\\(''event''\\)\\).join\\('', ''\\)\\)\")",
+      "Bash(printf '%s' '7824z708mbodvl')",
+      "Bash(printf '%s' 'WPL_AP1.ZZ8F5VzTQWMcUt')",
+      "Bash(curl -s \"https://spcial-copilot.vercel.app/api/inngest\")"
     ]
   }
 }
