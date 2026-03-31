@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2 } from "lucide-react";
@@ -9,6 +9,7 @@ import Link from "next/link";
 
 export default function CheckoutReturnPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const sessionId = searchParams.get("session_id");
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
@@ -20,14 +21,14 @@ export default function CheckoutReturnPage() {
       return;
     }
 
-    // The webhook handles the actual upgrade.
-    // We just show a success message after a brief delay.
+    // Wait for webhook to process, then refresh to pick up new plan
     const timer = setTimeout(() => {
       setStatus("success");
-    }, 2000);
+      router.refresh();
+    }, 3000);
 
     return () => clearTimeout(timer);
-  }, [sessionId]);
+  }, [sessionId, router]);
 
   return (
     <div className="flex-1 flex items-center justify-center p-8">
