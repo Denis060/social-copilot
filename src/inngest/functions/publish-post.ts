@@ -1,13 +1,8 @@
 import { inngest } from "@/inngest/client";
-import { createClient } from "@supabase/supabase-js";
+import { getServiceClient } from "@/lib/supabase/service";
 import { decrypt } from "@/lib/encryption";
 import { platformAdapters } from "@/lib/platforms/adapters";
 import { refreshTokenIfNeeded } from "@/lib/platforms/token-refresh";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export const publishPost = inngest.createFunction(
   {
@@ -16,6 +11,7 @@ export const publishPost = inngest.createFunction(
     triggers: [{ event: "post/schedule" }],
   },
   async ({ event, step }) => {
+    const supabase = getServiceClient();
     const { postId, scheduledAt } = event.data as { postId: string; scheduledAt: string };
 
     // Step 1: Wait until the scheduled time

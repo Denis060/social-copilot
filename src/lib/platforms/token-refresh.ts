@@ -1,11 +1,6 @@
 import { PLATFORMS } from "@/lib/platforms";
 import { encrypt } from "@/lib/encryption";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getServiceClient } from "@/lib/supabase/service";
 
 interface TokenData {
   access_token: string;
@@ -89,7 +84,7 @@ export async function refreshTokenIfNeeded(
     ).toISOString();
   }
 
-  await supabase
+  await getServiceClient()
     .from("social_accounts")
     .update(updates)
     .eq("id", accountId);

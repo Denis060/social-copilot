@@ -1,5 +1,5 @@
 import { inngest } from "@/inngest/client";
-import { createClient } from "@supabase/supabase-js";
+import { getServiceClient } from "@/lib/supabase/service";
 import { decrypt } from "@/lib/encryption";
 import { generateCommentReply } from "@/lib/gemini";
 import { refreshTokenIfNeeded } from "@/lib/platforms/token-refresh";
@@ -9,11 +9,6 @@ import {
   type AutoReplyRule,
 } from "@/lib/auto-reply/rules-engine";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export const monitorComments = inngest.createFunction(
   {
     id: "monitor-comments",
@@ -21,6 +16,7 @@ export const monitorComments = inngest.createFunction(
     triggers: [{ cron: "*/15 * * * *" }],
   },
   async ({ step }) => {
+    const supabase = getServiceClient();
     // Step 1: Fetch all premium users who have published posts
     const posts = await step.run("fetch-published-posts", async () => {
       // Only fetch posts belonging to premium users
