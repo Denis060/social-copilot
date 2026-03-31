@@ -32,10 +32,8 @@ export function DisconnectButton({ accountId, platformName }: { accountId: strin
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm" disabled={isDeleting}>
-          <Trash2 className="mr-2 h-4 w-4" /> Disconnect
-        </Button>
+      <AlertDialogTrigger render={<Button variant="destructive" size="sm" disabled={isDeleting} />}>
+        <Trash2 className="mr-2 h-4 w-4" /> Disconnect
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

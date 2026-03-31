@@ -33,7 +33,7 @@ export function AccountsGrid({ accounts, hasReachedLimit }: AccountsGridProps) {
             <CardContent>
               <CardDescription className="mb-4">
                 {connected 
-                  ? `Connected on ${new Date(connected.created_at).toLocaleDateString()}` 
+                  ? `Connected on ${new Date(connected.created_at as string).toLocaleDateString()}` 
                   : 'Connect your account to enable posting'}
               </CardDescription>
               
@@ -41,7 +41,7 @@ export function AccountsGrid({ accounts, hasReachedLimit }: AccountsGridProps) {
                 {connected ? (
                   <div className="flex w-full items-center justify-between">
                     <span className="text-sm text-green-600 dark:text-green-400 font-medium">Connected</span>
-                    <DisconnectButton accountId={connected.id} platformName={platform.name} />
+                    <DisconnectButton accountId={connected.id as string} platformName={platform.name} />
                   </div>
                 ) : isLocked ? (
                   <div className="flex w-full items-center justify-between">
