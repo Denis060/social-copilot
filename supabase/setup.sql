@@ -21,6 +21,8 @@ CREATE TABLE public.social_accounts (
   platform TEXT NOT NULL,
   access_token_encrypted TEXT NOT NULL,
   refresh_token_encrypted TEXT,
+  platform_username TEXT,
+  platform_avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 CREATE INDEX social_accounts_user_id_platform_idx ON public.social_accounts(user_id, platform);

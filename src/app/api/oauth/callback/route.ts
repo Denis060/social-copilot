@@ -104,6 +104,9 @@ export async function GET(req: Request) {
   const accessEncrypted = encrypt(accessToken);
   const refreshEncrypted = refreshToken ? encrypt(refreshToken) : null;
 
+  // Fetch platform profile info (name + avatar)
+  const platformProfile = await fetchPlatformProfile(platformId, accessToken);
+
   const { data: existing } = await supabase
     .from('social_accounts')
     .select('id')
@@ -115,6 +118,8 @@ export async function GET(req: Request) {
     await supabase.from('social_accounts').update({
       access_token_encrypted: accessEncrypted,
       refresh_token_encrypted: refreshEncrypted,
+      platform_username: platformProfile.username,
+      platform_avatar_url: platformProfile.avatarUrl,
     }).eq('id', existing.id);
   } else {
     await supabase.from('social_accounts').insert({
@@ -122,8 +127,122 @@ export async function GET(req: Request) {
       platform: platformId,
       access_token_encrypted: accessEncrypted,
       refresh_token_encrypted: refreshEncrypted,
+      platform_username: platformProfile.username,
+      platform_avatar_url: platformProfile.avatarUrl,
     });
   }
 
   return NextResponse.redirect(new URL('/accounts?success=true', origin));
+}
+
+async function fetchPlatformProfile(
+  platform: string,
+  accessToken: string
+): Promise<{ username: string; avatarUrl: string }> {
+  const empty = { username: "", avatarUrl: "" };
+  try {
+    switch (platform) {
+      case "youtube": {
+        const res = await fetch(
+          "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const data = await res.json();
+        const channel = data.items?.[0];
+        return {
+          username: channel?.snippet?.title || "",
+          avatarUrl: channel?.snippet?.thumbnails?.default?.url || "",
+        };
+      }
+      case "instagram": {
+        const res = await fetch(
+          `https://graph.instagram.com/me?fields=username,profile_picture_url&access_token=${accessToken}`
+        );
+        const data = await res.json();
+        return {
+          username: data.username || "",
+          avatarUrl: data.profile_picture_url || "",
+        };
+      }
+      case "facebook": {
+        const res = await fetch(
+          `https://graph.facebook.com/me?fields=name,picture.type(large)&access_token=${accessToken}`
+        );
+        const data = await res.json();
+        return {
+          username: data.name || "",
+          avatarUrl: data.picture?.data?.url || "",
+        };
+      }
+      case "linkedin": {
+        const res = await fetch("https://api.linkedin.com/v2/userinfo", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        return {
+          username: data.name || "",
+          avatarUrl: data.picture || "",
+        };
+      }
+      case "x": {
+        const res = await fetch("https://api.twitter.com/2/users/me?user.fields=profile_image_url", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        return {
+          username: data.data?.username || "",
+          avatarUrl: data.data?.profile_image_url || "",
+        };
+      }
+      case "discord": {
+        const res = await fetch("https://discord.com/api/v10/users/@me", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        const avatarHash = data.avatar;
+        return {
+          username: data.username || "",
+          avatarUrl: avatarHash
+            ? `https://cdn.discordapp.com/avatars/${data.id}/${avatarHash}.png`
+            : "",
+        };
+      }
+      case "tiktok": {
+        const res = await fetch(
+          "https://open.tiktokapis.com/v2/user/info/?fields=display_name,avatar_url",
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const data = await res.json();
+        return {
+          username: data.data?.user?.display_name || "",
+          avatarUrl: data.data?.user?.avatar_url || "",
+        };
+      }
+      case "pinterest": {
+        const res = await fetch("https://api.pinterest.com/v5/user_account", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        return {
+          username: data.username || "",
+          avatarUrl: data.profile_image || "",
+        };
+      }
+      case "slack": {
+        const res = await fetch("https://slack.com/api/auth.test", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        return {
+          username: data.user || "",
+          avatarUrl: "",
+        };
+      }
+      default:
+        return empty;
+    }
+  } catch (err) {
+    console.error(`Failed to fetch profile for ${platform}:`, err);
+    return empty;
+  }
 }
