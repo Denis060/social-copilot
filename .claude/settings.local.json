@@ -15,7 +15,11 @@
       "Bash(vercel env:*)",
       "Bash(vercel --prod --yes)",
       "Bash(vercel inspect:*)",
-      "Bash(vercel logs:*)"
+      "Bash(vercel logs:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(node -e \"const ik = require\\(''@imagekit/nodejs''\\); console.log\\(typeof ik.default, typeof ik.ImageKit\\)\")",
+      "Bash(node -e \"const IK = require\\(''@imagekit/nodejs''\\).default; const ik = new IK\\({urlEndpoint:''x'',privateKey:''y''}\\); console.log\\(Object.getOwnPropertyNames\\(Object.getPrototypeOf\\(ik\\)\\).filter\\(m => m !== ''constructor''\\).join\\('', ''\\)\\)\")",
+      "Bash(node -e \"const IK = require\\(''@imagekit/nodejs''\\).default; const ik = new IK\\({urlEndpoint:''x'',privateKey:''y''}\\); console.log\\(Object.getOwnPropertyNames\\(Object.getPrototypeOf\\(ik\\)\\).join\\('', ''\\)\\)\")"
     ]
   }
 }
