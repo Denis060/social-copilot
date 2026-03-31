@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MediaUploadProps {
@@ -103,13 +103,22 @@ export function MediaUpload({ mediaUrls, onUpload, onRemove }: MediaUploadProps)
 
       {mediaUrls.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {mediaUrls.map((url) => (
+          {mediaUrls.map((url) => {
+            const isVideo = /\.(mp4|mov|webm|avi|mkv)$/i.test(url);
+            return (
             <div key={url} className="group relative size-20 overflow-hidden rounded-lg border">
-              <img
-                src={url}
-                alt=""
-                className="size-full object-cover"
-              />
+              {isVideo ? (
+                <div className="flex size-full flex-col items-center justify-center bg-muted">
+                  <Film className="size-6 text-muted-foreground" />
+                  <span className="mt-1 text-[10px] text-muted-foreground">Video</span>
+                </div>
+              ) : (
+                <img
+                  src={url}
+                  alt=""
+                  className="size-full object-cover"
+                />
+              )}
               <Button
                 type="button"
                 variant="destructive"
@@ -123,7 +132,8 @@ export function MediaUpload({ mediaUrls, onUpload, onRemove }: MediaUploadProps)
                 <X className="size-3" />
               </Button>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
