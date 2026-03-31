@@ -75,16 +75,24 @@ export async function GET(req: Request) {
     return NextResponse.redirect(new URL('/accounts?error=config_missing', origin));
   }
 
+  const tokenBody: Record<string, string> = {
+    client_id: clientId,
+    client_secret: clientSecret,
+    code,
+    grant_type: 'authorization_code',
+    redirect_uri: redirectUri,
+  };
+
+  // TikTok uses client_key instead of client_id
+  if (platformId === 'tiktok') {
+    delete tokenBody.client_id;
+    tokenBody.client_key = clientId;
+  }
+
   const tokenResponse = await fetch(platform.tokenUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code,
-      grant_type: 'authorization_code',
-      redirect_uri: redirectUri,
-    }).toString(),
+    body: new URLSearchParams(tokenBody).toString(),
   });
 
   const tokenData = await tokenResponse.json();

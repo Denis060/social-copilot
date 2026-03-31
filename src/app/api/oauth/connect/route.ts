@@ -39,11 +39,18 @@ export async function GET(req: Request) {
 
   const redirectUri = `${origin}/api/oauth/callback`;
   const authUrl = new URL(platform.authUrl);
-  authUrl.searchParams.set('client_id', clientId);
   authUrl.searchParams.set('redirect_uri', redirectUri);
-  authUrl.searchParams.set('response_type', 'code');
-  authUrl.searchParams.set('scope', platform.scopes.join(' '));
   authUrl.searchParams.set('state', state);
+
+  if (platformId === 'tiktok') {
+    authUrl.searchParams.set('client_key', clientId);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('scope', platform.scopes.join(','));
+  } else {
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('scope', platform.scopes.join(' '));
+  }
 
   if (platformId === 'youtube') {
     authUrl.searchParams.set('access_type', 'offline');
