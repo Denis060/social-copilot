@@ -7,6 +7,9 @@ CREATE TABLE public.profiles (
   use_case TEXT,
   plan TEXT NOT NULL DEFAULT 'free',
   posts_this_month INTEGER NOT NULL DEFAULT 0,
+  bio TEXT,
+  website_url TEXT,
+  notification_preferences JSONB DEFAULT '{}',
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

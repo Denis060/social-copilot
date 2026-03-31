@@ -42,7 +42,7 @@ export const navItems = [
   },
   {
     title: "Settings",
-    href: "/dashboard/settings",
+    href: "/settings/profile",
     icon: Settings,
   },
 ];

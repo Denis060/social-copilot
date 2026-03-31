@@ -18,20 +18,18 @@ export default async function BillingPage() {
     .eq("id", user.id)
     .single();
 
-  return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Billing</h2>
-        <p className="text-muted-foreground mt-1">
-          Manage your subscription and billing details.
-        </p>
-      </div>
+  // Get connected account count for usage display
+  const { count: accountCount } = await supabase
+    .from("social_accounts")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
 
-      <BillingClient
-        plan={profile?.plan || "free"}
-        postsThisMonth={profile?.posts_this_month || 0}
-        hasSubscription={!!profile?.stripe_subscription_id}
-      />
-    </div>
+  return (
+    <BillingClient
+      plan={profile?.plan || "free"}
+      postsThisMonth={profile?.posts_this_month || 0}
+      connectedAccounts={accountCount || 0}
+      hasSubscription={!!profile?.stripe_subscription_id}
+    />
   );
 }

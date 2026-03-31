@@ -17,6 +17,7 @@ const stripePromise = loadStripe(
 interface BillingClientProps {
   plan: string;
   postsThisMonth: number;
+  connectedAccounts?: number;
   hasSubscription: boolean;
 }
 
@@ -39,6 +40,7 @@ export function BillingClient({
   plan,
   postsThisMonth,
   hasSubscription,
+  connectedAccounts = 0,
 }: BillingClientProps) {
   const [showCheckout, setShowCheckout] = useState(false);
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
