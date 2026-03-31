@@ -1,8 +1,14 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, type GenerativeModel } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+let _model: GenerativeModel | null = null;
 
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+function getModel(): GenerativeModel {
+  if (!_model) {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    _model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  }
+  return _model;
+}
 
 const PLATFORM_LIMITS: Record<string, number> = {
   instagram: 2200,
@@ -38,7 +44,7 @@ ${platformInstructions}
 
 Return ONLY a valid JSON object with platform names as keys and caption strings as values. No markdown, no code fences, just the JSON object. Example: {"instagram": "caption here", "x": "caption here"}`;
 
-  const result = await model.generateContent(prompt);
+  const result = await getModel().generateContent(prompt);
   const text = result.response.text().trim();
 
   const cleaned = text.replace(/```json\s*|```\s*/g, "").trim();
@@ -58,6 +64,6 @@ Comment: ${comment}
 
 Write a single reply. Be concise and authentic. Do not include quotes or labels, just the reply text.`;
 
-  const result = await model.generateContent(prompt);
+  const result = await getModel().generateContent(prompt);
   return result.response.text().trim();
 }

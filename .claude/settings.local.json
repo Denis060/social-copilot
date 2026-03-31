@@ -10,7 +10,12 @@
       "Bash(node -e \"const {serve} = require\\(''inngest/next''\\); console.log\\(typeof serve\\)\")",
       "Bash(node -e \"const {Inngest} = require\\(''inngest''\\); const i = new Inngest\\({id:''test''}\\); console.log\\(i.createFunction.toString\\(\\).substring\\(0, 200\\)\\)\")",
       "Bash(node -e \"const {serve} = require\\(''inngest/next''\\); console.log\\(serve.toString\\(\\).substring\\(0, 300\\)\\)\")",
-      "Bash(vercel --version)"
+      "Bash(vercel --version)",
+      "Bash(vercel link:*)",
+      "Bash(vercel env:*)",
+      "Bash(vercel --prod --yes)",
+      "Bash(vercel inspect:*)",
+      "Bash(vercel logs:*)"
     ]
   }
 }
