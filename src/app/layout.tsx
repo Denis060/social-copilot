@@ -17,8 +17,33 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Social-Copilot",
-  description: "Full-Stack Social Media SaaS",
+  title: {
+    default: "Social-Copilot — AI-Powered Social Media Management",
+    template: "%s | Social-Copilot",
+  },
+  description:
+    "Schedule posts, generate AI captions, auto-reply to comments, and track analytics across 9 social platforms. All from one dashboard.",
+  keywords: [
+    "social media management",
+    "AI captions",
+    "post scheduler",
+    "auto reply",
+    "analytics dashboard",
+  ],
+  openGraph: {
+    title: "Social-Copilot — AI-Powered Social Media Management",
+    description:
+      "Schedule posts, generate AI captions, auto-reply to comments, and track analytics across 9 social platforms.",
+    url: "https://spcial-copilot.vercel.app",
+    siteName: "Social-Copilot",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Social-Copilot — AI-Powered Social Media Management",
+    description:
+      "Schedule posts, generate AI captions, auto-reply to comments, and track analytics across 9 social platforms.",
+  },
 };
 
 export default async function RootLayout({
