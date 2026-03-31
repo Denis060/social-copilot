@@ -3,6 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 import { decrypt } from "@/lib/encryption";
 import { generateCommentReply } from "@/lib/gemini";
 import { refreshTokenIfNeeded } from "@/lib/platforms/token-refresh";
+import {
+  matchRule,
+  buildReplyInstructions,
+  type AutoReplyRule,
+} from "@/lib/auto-reply/rules-engine";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,14 +21,25 @@ export const monitorComments = inngest.createFunction(
     triggers: [{ cron: "*/15 * * * *" }],
   },
   async ({ step }) => {
-    // Step 1: Fetch all published posts with their destinations
+    // Step 1: Fetch all premium users who have published posts
     const posts = await step.run("fetch-published-posts", async () => {
+      // Only fetch posts belonging to premium users
+      const { data: premiumUsers } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("plan", "premium");
+
+      if (!premiumUsers?.length) return [];
+
+      const premiumUserIds = premiumUsers.map((u) => u.id);
+
       const { data } = await supabase
         .from("posts")
         .select(
           "id, content, user_id, post_destinations(id, external_id, account_id, social_accounts(id, platform, access_token_encrypted, refresh_token_encrypted, token_expires_at))"
         )
         .eq("status", "published")
+        .in("user_id", premiumUserIds)
         .not("post_destinations.external_id", "is", null);
 
       return data || [];
@@ -31,102 +47,147 @@ export const monitorComments = inngest.createFunction(
 
     let totalNewComments = 0;
 
-    for (const post of posts) {
-      const destinations = (post.post_destinations as unknown as Array<{
-        id: string;
-        external_id: string | null;
-        account_id: string;
-        social_accounts: {
+    // Group posts by user to fetch rules once per user
+    const userIds = [...new Set(posts.map((p) => p.user_id))];
+
+    for (const userId of userIds) {
+      // Fetch rules for this user
+      const rules = await step.run(
+        `fetch-rules-${userId}`,
+        async () => {
+          const { data } = await supabase
+            .from("auto_reply_rules")
+            .select("*")
+            .eq("user_id", userId)
+            .eq("is_active", true);
+          return (data || []) as AutoReplyRule[];
+        }
+      );
+
+      const userPosts = posts.filter((p) => p.user_id === userId);
+
+      for (const post of userPosts) {
+        const destinations = (post.post_destinations as unknown as Array<{
           id: string;
-          platform: string;
-          access_token_encrypted: string;
-          refresh_token_encrypted: string | null;
-          token_expires_at?: string | null;
-        };
-      }>) || [];
+          external_id: string | null;
+          account_id: string;
+          social_accounts: {
+            id: string;
+            platform: string;
+            access_token_encrypted: string;
+            refresh_token_encrypted: string | null;
+            token_expires_at?: string | null;
+          };
+        }>) || [];
 
-      for (const dest of destinations) {
-        if (!dest.external_id || !dest.social_accounts) continue;
+        for (const dest of destinations) {
+          if (!dest.external_id || !dest.social_accounts) continue;
 
-        const account = dest.social_accounts;
+          const account = dest.social_accounts;
 
-        const comments = await step.run(
-          `fetch-comments-${post.id}-${account.platform}`,
-          async () => {
-            const currentTokenEnc = await refreshTokenIfNeeded(
-              account.id,
-              account.platform,
-              account.access_token_encrypted,
-              account.refresh_token_encrypted,
-              account.token_expires_at || null
-            );
-
-            const token = decrypt(currentTokenEnc);
-            return fetchCommentsForPlatform(
-              account.platform,
-              token,
-              dest.external_id!
-            );
-          }
-        );
-
-        for (const comment of comments) {
-          // Check if we already processed this comment
-          const existing = await step.run(
-            `check-comment-${comment.id}`,
+          const comments = await step.run(
+            `fetch-comments-${post.id}-${account.platform}`,
             async () => {
-              const { data } = await supabase
-                .from("comment_events")
-                .select("id")
-                .eq("platform_comment_id", comment.id)
-                .single();
-              return data;
+              const currentTokenEnc = await refreshTokenIfNeeded(
+                account.id,
+                account.platform,
+                account.access_token_encrypted,
+                account.refresh_token_encrypted,
+                account.token_expires_at || null
+              );
+
+              const token = decrypt(currentTokenEnc);
+              return fetchCommentsForPlatform(
+                account.platform,
+                token,
+                dest.external_id!
+              );
             }
           );
 
-          if (existing) continue;
+          for (const comment of comments) {
+            // Check if we already processed this comment
+            const existing = await step.run(
+              `check-comment-${comment.id}`,
+              async () => {
+                const { data } = await supabase
+                  .from("comment_events")
+                  .select("id")
+                  .eq("platform_comment_id", comment.id)
+                  .single();
+                return data;
+              }
+            );
 
-          // Store the comment and generate a reply
-          await step.run(`process-comment-${comment.id}`, async () => {
-            await supabase.from("comment_events").insert({
-              post_id: post.id,
-              platform_comment_id: comment.id,
-              content: comment.text,
-              reply_sent: false,
+            if (existing) continue;
+
+            // Match against rules
+            const matchedRule = matchRule(
+              { text: comment.text, platform: account.platform },
+              rules
+            );
+
+            // Store the comment and generate a reply if a rule matches
+            await step.run(`process-comment-${comment.id}`, async () => {
+              if (!matchedRule) {
+                // No rule matched — log but don't reply
+                await supabase.from("comment_events").insert({
+                  post_id: post.id,
+                  platform_comment_id: comment.id,
+                  content: comment.text,
+                  platform: account.platform,
+                  reply_sent: false,
+                  rule_id: null,
+                });
+                return;
+              }
+
+              const replyInstructions = buildReplyInstructions(matchedRule);
+
+              const reply = await generateCommentReply(
+                comment.text,
+                post.content,
+                replyInstructions
+              );
+
+              // Store the comment event with rule reference and reply text
+              await supabase.from("comment_events").insert({
+                post_id: post.id,
+                platform_comment_id: comment.id,
+                content: comment.text,
+                reply_text: reply,
+                platform: account.platform,
+                reply_sent: false,
+                rule_id: matchedRule.id,
+              });
+
+              // Post the reply
+              const currentTokenEnc = await refreshTokenIfNeeded(
+                account.id,
+                account.platform,
+                account.access_token_encrypted,
+                account.refresh_token_encrypted,
+                account.token_expires_at || null
+              );
+              const token = decrypt(currentTokenEnc);
+
+              await replyToComment(
+                account.platform,
+                token,
+                dest.external_id!,
+                comment.id,
+                reply
+              );
+
+              // Mark as replied
+              await supabase
+                .from("comment_events")
+                .update({ reply_sent: true })
+                .eq("platform_comment_id", comment.id);
             });
 
-            const reply = await generateCommentReply(
-              comment.text,
-              post.content,
-              "Be friendly, helpful, and professional. Keep replies concise."
-            );
-
-            // Post the reply (platform-specific)
-            const currentTokenEnc = await refreshTokenIfNeeded(
-              account.id,
-              account.platform,
-              account.access_token_encrypted,
-              account.refresh_token_encrypted,
-              account.token_expires_at || null
-            );
-            const token = decrypt(currentTokenEnc);
-
-            await replyToComment(
-              account.platform,
-              token,
-              dest.external_id!,
-              comment.id,
-              reply
-            );
-
-            // Mark as replied
-            await supabase
-              .from("comment_events")
-              .update({ reply_sent: true })
-              .eq("platform_comment_id", comment.id);
-          });
-
-          totalNewComments++;
+            totalNewComments++;
+          }
         }
       }
     }

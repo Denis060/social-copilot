@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, PenBox, CalendarDays, Settings, LogOut, Zap, Share2 } from "lucide-react";
+import { LayoutDashboard, PenBox, CalendarDays, MessageSquareReply, CreditCard, Settings, LogOut, Zap, Share2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,9 +26,19 @@ export const navItems = [
     icon: CalendarDays,
   },
   {
+    title: "Auto-Reply",
+    href: "/auto-reply",
+    icon: MessageSquareReply,
+  },
+  {
     title: "Accounts",
     href: "/accounts",
     icon: Share2,
+  },
+  {
+    title: "Billing",
+    href: "/settings/billing",
+    icon: CreditCard,
   },
   {
     title: "Settings",

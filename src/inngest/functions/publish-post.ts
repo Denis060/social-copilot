@@ -16,9 +16,17 @@ export const publishPost = inngest.createFunction(
     triggers: [{ event: "post/schedule" }],
   },
   async ({ event, step }) => {
-    const { postId } = event.data as { postId: string; scheduledAt: string };
+    const { postId, scheduledAt } = event.data as { postId: string; scheduledAt: string };
 
-    // Step 1: Fetch post and destinations
+    // Step 1: Wait until the scheduled time
+    if (scheduledAt) {
+      const scheduledDate = new Date(scheduledAt);
+      if (scheduledDate.getTime() > Date.now()) {
+        await step.sleepUntil("wait-until-scheduled", scheduledDate);
+      }
+    }
+
+    // Step 2: Fetch post and destinations
     const { post, destinations } = await step.run(
       "fetch-post-data",
       async () => {

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/fofan/Downloads/spcial-copilot -type f -name *.sql)",
+      "Bash(find /c/Users/fofan/Downloads/spcial-copilot -type f \\\\\\(-name .env* -o -name tsconfig* \\\\\\))",
+      "Bash(ls \"c:/Users/fofan/Downloads/spcial-copilot/src/app/\\(dashboard\\)/\")",
+      "Bash(ls -la \"c:\\\\Users\\\\fofan\\\\Downloads\\\\spcial-copilot\\\\src\\\\app\\\\\\(dashboard\\)\")",
+      "Bash(find c:UsersfofanDownloadsspcial-copilot/src/app -type f -name *calendar*)",
+      "Bash(node -e \"const i = require\\(''inngest''\\); console.log\\(Object.keys\\(i\\).join\\('', ''\\)\\)\")",
+      "Bash(node -e \"const {serve} = require\\(''inngest/next''\\); console.log\\(typeof serve\\)\")",
+      "Bash(node -e \"const {Inngest} = require\\(''inngest''\\); const i = new Inngest\\({id:''test''}\\); console.log\\(i.createFunction.toString\\(\\).substring\\(0, 200\\)\\)\")",
+      "Bash(node -e \"const {serve} = require\\(''inngest/next''\\); console.log\\(serve.toString\\(\\).substring\\(0, 300\\)\\)\")",
+      "Bash(vercel --version)"
+    ]
+  }
+}
