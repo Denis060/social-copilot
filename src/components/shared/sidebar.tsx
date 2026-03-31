@@ -121,7 +121,7 @@ export function SidebarContent() {
               </span>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign Out" className="hidden lg:flex shrink-0">
+          <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign Out" className="shrink-0">
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
