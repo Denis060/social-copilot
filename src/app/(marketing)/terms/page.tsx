@@ -101,7 +101,7 @@ export default function TermsOfServicePage() {
 
         <h2>8. Intellectual Property</h2>
         <ul>
-          <li>The Service, including its design, code, and branding, is owned by Social-Copilot</li>
+          <li>The Service, including its design, code, and branding, is owned by Jobos Technologies LLC</li>
           <li>You retain ownership of all content you create and publish through the Service</li>
           <li>You grant us a limited license to store and process your content solely to provide the Service</li>
         </ul>
@@ -124,7 +124,7 @@ export default function TermsOfServicePage() {
 
         <h2>11. Limitation of Liability</h2>
         <p>
-          To the maximum extent permitted by law, Social-Copilot shall not be
+          To the maximum extent permitted by law, Jobos Technologies LLC shall not be
           liable for any indirect, incidental, special, consequential, or
           punitive damages, including but not limited to loss of profits, data,
           or business opportunities, arising from your use of the Service.

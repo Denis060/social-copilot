@@ -14,8 +14,8 @@ export default function PrivacyPolicyPage() {
 
       <div className="prose prose-sm dark:prose-invert max-w-none space-y-6 text-sm leading-relaxed text-muted-foreground [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-foreground [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1">
         <p>
-          Social-Copilot ("we", "our", or "us") operates the Social-Copilot
-          platform (the "Service"). This Privacy Policy explains how we collect,
+          Jobos Technologies LLC ("we", "our", or "us") operates the
+          Social-Copilot platform (the "Service"). This Privacy Policy explains how we collect,
           use, disclose, and safeguard your information when you use our Service.
         </p>
 

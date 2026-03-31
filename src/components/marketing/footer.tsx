@@ -41,7 +41,9 @@ export function MarketingFooter() {
           </div>
         </div>
         <div className="mt-8 border-t pt-6 text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Social-Copilot. All rights reserved.
+          &copy; {new Date().getFullYear()} Jobos Technologies LLC. All rights reserved.
+          <span className="mx-1.5">·</span>
+          Social-Copilot is a product of Jobos Technologies LLC.
         </div>
       </div>
     </footer>
