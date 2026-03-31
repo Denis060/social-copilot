@@ -58,14 +58,18 @@ export async function publishNow(postId: string) {
 
   if (error) throw new Error("Failed to publish post");
 
-  // Trigger immediate publishing via Inngest
-  await inngest.send({
-    name: "post/schedule",
-    data: {
-      postId,
-      scheduledAt: new Date().toISOString(),
-    },
-  });
+  // Trigger immediate publishing via Inngest (non-blocking)
+  try {
+    await inngest.send({
+      name: "post/schedule",
+      data: {
+        postId,
+        scheduledAt: new Date().toISOString(),
+      },
+    });
+  } catch (err) {
+    console.error("Inngest event send failed (non-blocking):", err);
+  }
 
   revalidatePath("/calendar");
 }
