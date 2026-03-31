@@ -41,12 +41,12 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Link href="/dashboard/composer" title="New Post" className={buttonVariants({ variant: "outline", size: "sm", className: "hidden sm:flex" })}>
+        <Link href="/composer" title="New Post" className={buttonVariants({ variant: "outline", size: "sm", className: "hidden sm:flex" })}>
           <Plus className="mr-2 h-4 w-4" />
           New Post
         </Link>
         
-        <Link href="/dashboard/composer" title="New Post" className={buttonVariants({ variant: "outline", size: "icon", className: "sm:hidden" })}>
+        <Link href="/composer" title="New Post" className={buttonVariants({ variant: "outline", size: "icon", className: "sm:hidden" })}>
           <Plus className="h-4 w-4" />
           <span className="sr-only">New Post</span>
         </Link>
