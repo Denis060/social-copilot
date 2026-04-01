@@ -29,7 +29,8 @@
       "Bash(printf '%s' 'WPL_AP1.ZZ8F5VzTQWMcUt')",
       "Bash(curl -s \"https://spcial-copilot.vercel.app/api/inngest\")",
       "Bash(curl -s -X POST \"https://spcial-copilot.vercel.app/api/inngest\" -H \"Content-Type: application/json\" -d '{\"\"\"\"test\"\"\"\": true}')",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(curl -s \"https://spcial-copilot.vercel.app/api/debug-env\")"
     ]
   }
 }
