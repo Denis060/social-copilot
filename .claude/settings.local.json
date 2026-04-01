@@ -27,7 +27,9 @@
       "Bash(node -e \"const {Inngest} = require\\(''inngest''\\); const i = new Inngest\\({id:''test''}\\); console.log\\(Object.keys\\(i\\).filter\\(k => k.includes\\(''key''\\) || k.includes\\(''Key''\\) || k.includes\\(''event''\\)\\).join\\('', ''\\)\\)\")",
       "Bash(printf '%s' '7824z708mbodvl')",
       "Bash(printf '%s' 'WPL_AP1.ZZ8F5VzTQWMcUt')",
-      "Bash(curl -s \"https://spcial-copilot.vercel.app/api/inngest\")"
+      "Bash(curl -s \"https://spcial-copilot.vercel.app/api/inngest\")",
+      "Bash(curl -s -X POST \"https://spcial-copilot.vercel.app/api/inngest\" -H \"Content-Type: application/json\" -d '{\"\"\"\"test\"\"\"\": true}')",
+      "Bash(node -e \":*)"
     ]
   }
 }
