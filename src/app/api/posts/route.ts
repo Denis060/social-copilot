@@ -113,22 +113,19 @@ export async function POST(request: NextRequest) {
   }
 
   // Send Inngest event for scheduled posts
-  let inngestError: string | null = null;
   if (status === "scheduled") {
     try {
-      const sendResult = await inngest.send({
+      await inngest.send({
         name: "post/schedule",
         data: {
           postId: post.id,
           scheduledAt: scheduledAt || new Date().toISOString(),
         },
       });
-      console.log("Inngest send result:", JSON.stringify(sendResult));
     } catch (err) {
-      inngestError = err instanceof Error ? err.message : String(err);
-      console.error("Inngest event send failed:", inngestError);
+      console.error("Inngest event send failed:", err);
     }
   }
 
-  return NextResponse.json({ id: post.id, status, inngestError });
+  return NextResponse.json({ id: post.id, status });
 }
